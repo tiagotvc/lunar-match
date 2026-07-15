@@ -522,8 +522,12 @@ namespace SweetSugar.Scripts.Core
             }
 
             Camera.main.GetComponent<MapCamera>().enabled = enable;
-            LevelsMap.SetActive(!enable);
-            LevelsMap.SetActive(enable);
+            // LevelsMap (the old winding-path map screen) is permanently retired in favor of
+            // WorldSelectController - previously this force-toggled LevelsMap.SetActive(!enable)
+            // then SetActive(enable) (a common Unity trick to force OnEnable to refire), which
+            // meant every reactive EnableMap(true) call (any time gameStatus becomes
+            // GameState.Map) unconditionally re-enabled LevelsMap regardless of anything else
+            // in the scene trying to keep it hidden. Left deliberately untouched now.
             Level.SetActive(!enable);
 
             if (!isRun && Camera.main.GetComponent<MapCamera>().isActiveAndEnabled)
