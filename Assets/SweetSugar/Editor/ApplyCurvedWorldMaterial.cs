@@ -38,28 +38,12 @@ namespace SweetSugar.Editor
                 count++;
             }
 
-            for (var i = 1; i <= 5; i++)
-            {
-                var background = GameObject.Find($"map_background_0{i}");
-                if (background == null)
-                {
-                    Debug.LogWarning($"Could not find map_background_0{i}");
-                    continue;
-                }
+            // The map_background_0N tiles are no longer touched here - they're plain 4-vertex
+            // sprite quads and displacing each independently broke the seams between them.
+            // Run "Sweet Sugar > Build Continuous Map Background" instead, which replaces
+            // them with one subdivided mesh that curves smoothly with no seams.
 
-                var renderer = background.GetComponent<SpriteRenderer>();
-                if (renderer == null)
-                {
-                    continue;
-                }
-
-                Undo.RecordObject(renderer, "Apply Curved World Material");
-                renderer.sharedMaterial = material;
-                EditorUtility.SetDirty(renderer);
-                count++;
-            }
-
-            Debug.Log($"Applied curved world material to {count} sprite renderers. Save the scene (Ctrl+S) to keep it.");
+            Debug.Log($"Applied curved world material to {count} sprite renderers (Map details only). Save the scene (Ctrl+S) to keep it.");
         }
     }
 }
