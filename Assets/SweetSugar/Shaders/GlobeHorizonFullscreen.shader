@@ -34,11 +34,15 @@ Shader "Custom/GlobeHorizonFullscreen"
             #pragma fragment Frag
             #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
 
-            float _Curvature;
-            float _VerticalCenter;
+            CBUFFER_START(UnityPerMaterial)
+                float _Curvature;
+                float _VerticalCenter;
+            CBUFFER_END
 
             float4 Frag(Varyings input) : SV_Target
             {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+
                 float2 uv = input.texcoord;
                 float cy = uv.y - _VerticalCenter;
 
