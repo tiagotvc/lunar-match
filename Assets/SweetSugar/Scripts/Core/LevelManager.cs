@@ -543,8 +543,15 @@ namespace SweetSugar.Scripts.Core
 
         private void setNumbers()
         {
-            var numberObject = Resources.Load<GameObject>("Prefabs/Number");
             var parentObj = FindObjectOfType<Path>();
+            if (parentObj == null)
+            {
+                // No map Path in the scene (e.g. LevelsMap disabled - the world/level select
+                // screen replaced the old map UI) - nothing to number, skip.
+                return;
+            }
+
+            var numberObject = Resources.Load<GameObject>("Prefabs/Number");
             StartCoroutine(SetLevelNumberToMapObject(numberObject, parentObj.Waypoints));
         }
 
