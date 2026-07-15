@@ -55,6 +55,20 @@ namespace SweetSugar.Scripts.UI
         private int _currentIndex;
         private Image[] _pageDots;
 
+        private void Awake()
+        {
+            // The old LevelsMap (world-space map sprites + its own CanvasMap) competes with
+            // this screen for the view - LevelManager's gameStatus setter calls EnableMap(true)
+            // on boot (gameStatus starts as GameState.Map), which repositions Camera.main to
+            // frame the map's world-space content. Disabling LevelsMap outright removes it from
+            // the scene entirely instead of fighting Canvas sort order / camera framing.
+            var levelsMap = GameObject.Find("LevelsMap");
+            if (levelsMap != null)
+            {
+                levelsMap.SetActive(false);
+            }
+        }
+
         private void Start()
         {
             BuildPageDots();
