@@ -1,7 +1,4 @@
 using System;
-using SweetSugar.Scripts.Core;
-using SweetSugar.Scripts.GUI;
-using SweetSugar.Scripts.GUI.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -90,7 +87,7 @@ namespace SweetSugar.Scripts.UI
         public void OnPlayPressed()
         {
             var chapter = chapters[_currentIndex];
-            var reached = PlayerPrefs.GetInt("ReachedLevel", 1);
+            var reached = LevelFlowHelper.ReachedLevel;
             var levelToOpen = reached;
             if (reached < chapter.firstLevel || reached >= chapter.firstLevel + chapter.levelCount)
             {
@@ -98,27 +95,17 @@ namespace SweetSugar.Scripts.UI
                 levelToOpen = chapter.firstLevel;
             }
 
-            // OpenMenuPlay alone only shows the "MenuPlay" confirmation popup - in the
-            // original flow, that popup has its own Play button wired to
-            // AnimationEventManager.Play(), which calls GUIUtils.StartGame() (spends a life,
-            // sets gameStatus = GameState.PrepareGame) and then CloseMenu(). We want a single
-            // tap here, so do both steps at once instead of requiring a second confirmation.
-            InitScript.OpenMenuPlay(levelToOpen);
-
-            if (GUIUtils.THIS != null)
-            {
-                // NOTE: if the player has 0 lives, StartGame() opens the life shop instead of
-                // starting the level - same limitation the original MenuPlay flow has.
-                GUIUtils.THIS.StartGame();
-            }
-
-            var menuPlay = ReferenceRestorer.FindMenuPlay();
-            if (menuPlay != null)
-            {
-                menuPlay.SetActive(false);
-            }
-
+            LevelFlowHelper.PlayLevel(levelToOpen);
             gameObject.SetActive(false);
+        }
+
+        public void OnOpenLevelSelect()
+        {
+            var levelSelect = GameObject.Find("LevelSelect");
+            if (levelSelect != null)
+            {
+                levelSelect.SetActive(true);
+            }
         }
 
         private void Refresh()
