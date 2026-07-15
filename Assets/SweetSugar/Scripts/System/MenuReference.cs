@@ -50,7 +50,7 @@ namespace SweetSugar.Scripts.System
             var canvas = THIS.transform;
             foreach (Transform item in canvas)
             {
-                if (item.name != "SettingsButton" && item.name != "Tutorials" && item.name != "Orientations" && item.name != "TutorialManager" && !item.name.Contains("Rate"))
+                if (item.name != "SettingsButton" && item.name != "Tutorials" && item.name != "Orientations" && item.name != "TutorialManager" && item.name != "WorldSelect" && !item.name.Contains("Rate"))
                     item.gameObject.SetActive(false);
             }
         }
