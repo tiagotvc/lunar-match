@@ -1,19 +1,21 @@
 // Based on Universal Render Pipeline/2D/Sprite-Unlit-Default (com.unity.render-pipelines.universal
 // Shaders/2D/Sprite-Unlit-Default.shader) with a world-space vertex offset added.
 //
-// Bows every sprite horizontally based on how far it is, vertically, from the camera's
-// current position - squared, so the curve grows toward the top/bottom of the screen and
-// stays flat near the camera's vertical center. Assign this same shader/material to every
-// map element (background, path, nodes, decorations) so they all bend together as one
-// surface instead of independently - that's what reads as "wrapping around a globe"
-// instead of a flat plane, using only an orthographic 2D camera (no perspective trick).
+// Compresses every sprite's X position toward the camera's current X, growing with the
+// square of vertical distance from the camera - so content near the top/bottom of the
+// screen pulls in toward the center instead of the whole map leaning sideways. That reads
+// as "receding toward a horizon" (a symmetric squeeze) rather than a one-directional lean,
+// which is what a plain additive offset produced (rejected - see git history). Assign this
+// same shader/material to every map element (background, path, nodes, decorations) so they
+// all bend together as one surface instead of independently, using only an orthographic 2D
+// camera (no perspective trick).
 Shader "Custom/CurvedWorldSprite"
 {
     Properties
     {
         _MainTex ("Sprite Texture", 2D) = "white" {}
         [MaterialToggle] _ZWrite("ZWrite", Float) = 0
-        _Curvature ("Curvature", Float) = 0.01
+        _Curvature ("Curvature", Float) = 0.0005
 
         // Legacy properties, present so materials using this shader can fall back to the
         // default sprite shader gracefully (same as the stock URP sprite shader).
@@ -77,7 +79,8 @@ Shader "Custom/CurvedWorldSprite"
 
                 float3 positionWS = TransformObjectToWorld(input.positionOS);
                 float dy = positionWS.y - _WorldSpaceCameraPos.y;
-                positionWS.x += dy * dy * _Curvature;
+                float squeeze = saturate(1.0 - _Curvature * dy * dy);
+                positionWS.x = _WorldSpaceCameraPos.x + (positionWS.x - _WorldSpaceCameraPos.x) * squeeze;
 
                 o.positionCS = TransformWorldToHClip(positionWS);
             #if defined(DEBUG_DISPLAY)

@@ -51,7 +51,7 @@ namespace SweetSugar.Editor
 
                 material = new Material(shader) { name = "CurvedContinuousMesh" };
                 material.SetTexture("_MainTex", texture);
-                material.SetFloat("_Curvature", 0.005f);
+                material.SetFloat("_Curvature", 0.0005f);
                 AssetDatabase.CreateAsset(material, MaterialPath);
             }
 

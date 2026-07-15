@@ -6,16 +6,18 @@
 // reusing that shader here would silently zero out the mesh (UnityFlipSprite multiplies
 // position by an unbound flip value).
 //
-// Same curvature math as CurvedWorldSprite: offsets X by the squared vertical distance from
-// the camera. Because this is one continuous mesh with many vertices instead of five
-// separate 4-vertex sprite quads, the curve is smooth across the whole background with no
-// seams between what used to be five separate tiles.
+// Same curvature math as CurvedWorldSprite: compresses X toward the camera's X, growing
+// with the squared vertical distance from the camera - a symmetric squeeze that reads as
+// receding toward a horizon, not a one-directional lean. Because this is one continuous
+// mesh with many vertices instead of five separate 4-vertex sprite quads, the curve is
+// smooth across the whole background with no seams between what used to be five separate
+// tiles.
 Shader "Custom/CurvedContinuousMesh"
 {
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _Curvature ("Curvature", Float) = 0.005
+        _Curvature ("Curvature", Float) = 0.0005
     }
 
     SubShader
@@ -58,7 +60,8 @@ Shader "Custom/CurvedContinuousMesh"
 
                 float3 positionWS = TransformObjectToWorld(input.positionOS);
                 float dy = positionWS.y - _WorldSpaceCameraPos.y;
-                positionWS.x += dy * dy * _Curvature;
+                float squeeze = saturate(1.0 - _Curvature * dy * dy);
+                positionWS.x = _WorldSpaceCameraPos.x + (positionWS.x - _WorldSpaceCameraPos.x) * squeeze;
 
                 o.positionCS = TransformWorldToHClip(positionWS);
                 o.uv = input.uv;
