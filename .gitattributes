@@ -1,3 +1,24 @@
+* text=auto eol=lf
+
+*.cs diff=csharp text
+*.cginc text
+*.shader text
+*.hlsl text
+*.compute text
+# Unity YAML assets (Force Text serialization) - merge with Unity's tool, lock scenes/prefabs to avoid unmergeable conflicts
+*.unity merge=unityyamlmerge eol=lf text lockable
+*.prefab merge=unityyamlmerge eol=lf text lockable
+*.asset merge=unityyamlmerge eol=lf text
+*.mat merge=unityyamlmerge eol=lf text
+*.anim merge=unityyamlmerge eol=lf text
+*.controller merge=unityyamlmerge eol=lf text
+*.physicsMaterial2D merge=unityyamlmerge eol=lf text
+*.physicMaterial merge=unityyamlmerge eol=lf text
+*.playable merge=unityyamlmerge eol=lf text
+*.mixer merge=unityyamlmerge eol=lf text
+*.shadergraph merge=unityyamlmerge eol=lf text
+*.meta merge=unityyamlmerge eol=lf text
+# Images
 *.png filter=lfs diff=lfs merge=lfs -text
 *.jpg filter=lfs diff=lfs merge=lfs -text
 *.jpeg filter=lfs diff=lfs merge=lfs -text
@@ -8,22 +29,27 @@
 *.psd filter=lfs diff=lfs merge=lfs -text
 *.exr filter=lfs diff=lfs merge=lfs -text
 *.hdr filter=lfs diff=lfs merge=lfs -text
+# Audio
 *.wav filter=lfs diff=lfs merge=lfs -text
 *.mp3 filter=lfs diff=lfs merge=lfs -text
 *.ogg filter=lfs diff=lfs merge=lfs -text
 *.aif filter=lfs diff=lfs merge=lfs -text
 *.aiff filter=lfs diff=lfs merge=lfs -text
+# Video
 *.mp4 filter=lfs diff=lfs merge=lfs -text
 *.mov filter=lfs diff=lfs merge=lfs -text
 *.webm filter=lfs diff=lfs merge=lfs -text
+# Fonts
 *.ttf filter=lfs diff=lfs merge=lfs -text
 *.TTF filter=lfs diff=lfs merge=lfs -text
 *.otf filter=lfs diff=lfs merge=lfs -text
+# 3D models
 *.fbx filter=lfs diff=lfs merge=lfs -text
 *.obj filter=lfs diff=lfs merge=lfs -text
 *.blend filter=lfs diff=lfs merge=lfs -text
 *.dae filter=lfs diff=lfs merge=lfs -text
 *.3ds filter=lfs diff=lfs merge=lfs -text
+# Misc binaries
 *.unitypackage filter=lfs diff=lfs merge=lfs -text
 *.pdf filter=lfs diff=lfs merge=lfs -text
 *.exe filter=lfs diff=lfs merge=lfs -text
