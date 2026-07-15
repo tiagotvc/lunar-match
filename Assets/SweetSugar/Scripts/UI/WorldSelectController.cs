@@ -1,3 +1,4 @@
+using System;
 using SweetSugar.Scripts.Core;
 using TMPro;
 using UnityEngine;
@@ -13,9 +14,15 @@ namespace SweetSugar.Scripts.UI
     // 20-level chunks (matches BackgroundsForStaticMap's existing chunking). Star totals are
     // placeholders (not yet reading real per-level star data) - wire that up once the real
     // chapter/star data model exists.
+    //
+    // NOTE: this file lives under the SweetSugar.Scripts.UI namespace, which shares the
+    // SweetSugar.Scripts parent with an existing SweetSugar.Scripts.System namespace (from
+    // Scripts/System/AnimateItems.cs) - that shadows the real .NET System namespace for
+    // unqualified "System.X" references here, hence the explicit "using System" instead of
+    // writing "[System.Serializable]" inline.
     public class WorldSelectController : MonoBehaviour
     {
-        [System.Serializable]
+        [Serializable]
         public class Chapter
         {
             public string title;

@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,7 +26,7 @@ namespace SweetSugar.Scripts.UI
             if (titleText != null) titleText.text = chapter.title;
             if (starsText != null) starsText.text = $"{chapter.placeholderStarsEarned}/{chapter.placeholderStarsTotal}";
 
-            var chapterNumber = System.Array.IndexOf(FindController()?.chapters ?? new WorldSelectController.Chapter[0], chapter) + 1;
+            var chapterNumber = Array.IndexOf(FindController()?.chapters ?? new WorldSelectController.Chapter[0], chapter) + 1;
             if (chapterLabel != null) chapterLabel.text = chapterNumber > 0 ? $"CAPITULO {chapterNumber}" : string.Empty;
 
             if (cardRoot != null)
