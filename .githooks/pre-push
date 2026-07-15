@@ -1,0 +1,63 @@
+#!/bin/sh
+# Shared pre-push hook (tracked in git, enabled via `git config core.hooksPath .githooks`)
+#
+# 1. Uploads Git LFS objects for the commits being pushed (what `git lfs install`
+#    normally wires into .git/hooks/pre-push - we do it here so it's tracked and
+#    shared instead of living only in one machine's local .git folder).
+# 2. Blocks the push if any file matching an LFS pattern in .gitattributes was
+#    committed as a raw binary instead of an LFS pointer - this is what happens
+#    silently when someone pushes from a machine where `git lfs install` was
+#    never run.
+
+command -v git-lfs >/dev/null 2>&1 || {
+  printf >&2 "\n%s\n\n" "Este repositorio usa Git LFS, mas o 'git-lfs' nao foi encontrado no PATH. Instale o Git LFS e rode 'git lfs install' antes de dar push."
+  exit 2
+}
+
+git lfs pre-push "$@" || exit $?
+
+zero="0000000000000000000000000000000000000000"
+empty_tree="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+bad_files=""
+
+tmp_changed=$(mktemp)
+tmp_lfs=$(mktemp)
+trap 'rm -f "$tmp_changed" "$tmp_lfs"' EXIT
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$zero" ] && continue # branch deletion, nothing to check
+
+  if [ "$remote_sha" = "$zero" ]; then
+    range="$empty_tree..$local_sha"
+  else
+    range="$remote_sha..$local_sha"
+  fi
+
+  git diff --name-only --diff-filter=ACMR "$range" -- > "$tmp_changed" 2>/dev/null
+  [ -s "$tmp_changed" ] || continue
+
+  # Batch attribute lookup - one git process for every changed file instead of one per file
+  git check-attr --stdin filter < "$tmp_changed" | sed -n 's/: filter: lfs$//p' > "$tmp_lfs"
+  [ -s "$tmp_lfs" ] || continue
+
+  while IFS= read -r f; do
+    blob=$(git rev-parse "$local_sha:$f" 2>/dev/null) || continue
+    header=$(git cat-file -p "$blob" 2>/dev/null | head -c 43)
+    case "$header" in
+      "version https://git-lfs.github.com/spec"*) ;; # ok, real pointer
+      *)
+        bad_files="$bad_files
+  - $f ($local_ref)"
+        ;;
+    esac
+  done < "$tmp_lfs"
+done
+
+if [ -n "$bad_files" ]; then
+  printf >&2 "\n[BLOQUEADO] Estes arquivos deveriam estar no Git LFS mas foram commitados como binario normal:%s\n\n" "$bad_files"
+  printf >&2 "%s\n" "Causa provavel: 'git lfs install' nunca rodou nesta maquina."
+  printf >&2 "%s\n\n" "Corrija com: git lfs install  &&  refaça o commit desses arquivos (git add + git commit --amend, ou um novo commit)."
+  exit 1
+fi
+
+exit 0
