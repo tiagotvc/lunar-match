@@ -28,7 +28,12 @@ namespace SweetSugar.Scripts.UI
 
         public static void PlayLevel(int level)
         {
+            // TEMP diagnostic logging - remove once the grid-click black-screen bug is found.
+            // Compare this log trail between a working JOGAR click and a broken grid click.
+            Debug.Log($"[LevelFlowHelper] PlayLevel({level}) start. GUIUtils.THIS={(GUIUtils.THIS != null ? "ok" : "NULL")}, LevelManager.THIS={(LevelManager.THIS != null ? "ok" : "NULL")}, gameStatus BEFORE={LevelManager.GetGameStatus()}, lifes={InitScript.lifes}");
+
             InitScript.OpenMenuPlay(level);
+            Debug.Log($"[LevelFlowHelper] After OpenMenuPlay: gameStatus={LevelManager.GetGameStatus()}, OpenLevel pref={PlayerPrefs.GetInt("OpenLevel")}");
 
             if (GUIUtils.THIS != null)
             {
@@ -36,12 +41,14 @@ namespace SweetSugar.Scripts.UI
                 // starting the level - same limitation the original MenuPlay flow has.
                 GUIUtils.THIS.StartGame();
             }
+            Debug.Log($"[LevelFlowHelper] After StartGame: gameStatus={LevelManager.GetGameStatus()}, fieldBoards.Count={LevelManager.THIS?.fieldBoards.Count}, levelLoaded={LevelManager.THIS?.levelLoaded}");
 
             var menuPlay = ReferenceRestorer.FindMenuPlay();
             if (menuPlay != null)
             {
                 menuPlay.SetActive(false);
             }
+            Debug.Log($"[LevelFlowHelper] PlayLevel({level}) end. Level active={GameObject.Find("Level")?.activeSelf}, Main Camera pos={Camera.main.transform.position}, orthoSize={Camera.main.orthographicSize}");
         }
     }
 }
