@@ -9,6 +9,7 @@ namespace SweetSugar.Scripts.UI
     {
         public Transform gridParent;
         public GameObject cellTemplate;
+        public GameObject worldSelectScreen;
 
         private bool _built;
 
@@ -68,10 +69,9 @@ namespace SweetSugar.Scripts.UI
             LevelFlowHelper.PlayLevel(level);
             gameObject.SetActive(false);
 
-            var worldSelect = GameObject.Find("WorldSelect");
-            if (worldSelect != null)
+            if (worldSelectScreen != null)
             {
-                worldSelect.SetActive(false);
+                worldSelectScreen.SetActive(false);
             }
         }
     }

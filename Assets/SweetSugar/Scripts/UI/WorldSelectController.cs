@@ -49,6 +49,11 @@ namespace SweetSugar.Scripts.UI
         public GameObject pageDotPrefab;
         public Button playButton;
 
+        [Header("Level select (assigned by the builder tool)")]
+        // GameObject.Find does not find inactive objects, and LevelSelect starts inactive -
+        // a direct reference (set by BuildLevelSelectScreen.cs) avoids that gotcha entirely.
+        public GameObject levelSelectScreen;
+
         private int _currentIndex;
         private Image[] _pageDots;
 
@@ -101,10 +106,9 @@ namespace SweetSugar.Scripts.UI
 
         public void OnOpenLevelSelect()
         {
-            var levelSelect = GameObject.Find("LevelSelect");
-            if (levelSelect != null)
+            if (levelSelectScreen != null)
             {
-                levelSelect.SetActive(true);
+                levelSelectScreen.SetActive(true);
             }
         }
 

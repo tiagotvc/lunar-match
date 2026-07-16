@@ -101,19 +101,26 @@ namespace SweetSugar.Editor
             EditorUtility.SetDirty(canvasGlobal);
             Debug.Log("Built LevelSelect screen under CanvasGlobal (inactive by default).");
 
-            WireOpenButtonOnWorldSelect(canvasGlobalRect);
+            var worldSelectController = WireOpenButtonOnWorldSelect(canvasGlobalRect, screen.gameObject);
+            if (worldSelectController != null)
+            {
+                controller.worldSelectScreen = worldSelectController.gameObject;
+            }
 
             Selection.activeGameObject = screen.gameObject;
             Debug.Log("Save the scene (Ctrl+S) to keep it.");
         }
 
-        private static void WireOpenButtonOnWorldSelect(RectTransform canvasGlobalRect)
+        // Returns the found WorldSelectController (or null) so the caller can cross-wire
+        // LevelSelectController.worldSelectScreen too - both screens need a direct reference
+        // to each other since GameObject.Find can't find whichever one is currently inactive.
+        private static WorldSelectController WireOpenButtonOnWorldSelect(RectTransform canvasGlobalRect, GameObject levelSelectScreen)
         {
             var worldSelectTransform = canvasGlobalRect.Find(WorldSelectScreenName());
             if (worldSelectTransform == null)
             {
                 Debug.LogWarning("\"WorldSelect\" not found under CanvasGlobal - run Sweet Sugar > Build World Select Screen first, then re-run this to add the open button.");
-                return;
+                return null;
             }
 
             var worldSelect = worldSelectTransform.GetComponent<RectTransform>();
@@ -128,8 +135,10 @@ namespace SweetSugar.Editor
             if (worldSelectController == null)
             {
                 Debug.LogWarning("WorldSelect has no WorldSelectController component - can't wire the open button.");
-                return;
+                return null;
             }
+
+            worldSelectController.levelSelectScreen = levelSelectScreen;
 
             var openButton = CreateButton(worldSelect, "OpenLevelSelectButton", "Fases", new Color(1f, 1f, 1f, 0.18f), Color.white, 22);
             var rect = openButton.GetComponent<RectTransform>();
@@ -139,6 +148,8 @@ namespace SweetSugar.Editor
             rect.offsetMax = Vector2.zero;
 
             UnityEventTools.AddPersistentListener(openButton.onClick, worldSelectController.OnOpenLevelSelect);
+
+            return worldSelectController;
         }
 
         private static string WorldSelectScreenName() => "WorldSelect";
